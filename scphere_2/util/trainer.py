@@ -5,7 +5,7 @@ from scphere_2.model.vae import OptimizerVAE
 
 # ==============================================================================
 class Trainer(object):
-    def __init__(self, x, model, batch_id=None, mb_size=128,
+    def __init__(self, x, model, batch_id=None, init_vars=None, mb_size=128,
                  learning_rate=0.001, max_epoch=100):
 
         self.model, self.mb_size, self.max_epoch = \
@@ -13,6 +13,9 @@ class Trainer(object):
 
         self.max_iter = int(x.shape[0] / self.mb_size) * \
             self.max_epoch
+
+        l = []
+
 
         # self.x = x
         # self.batch = batch_id
@@ -30,17 +33,17 @@ class Trainer(object):
         self.status['elbo'] = []
 
         self.session = model.session
-        # self.session.run(tf.compat.v1.global_variables_initializer())
-        l = []
-        for var in tf.compat.v1.global_variables():
-            if var.dtype == 'int64':
-                mul = 1
-            else:
-                mul = 0.001
-            l.append(var.assign(tf.ones_like(var) * mul))
+        self.session.run(tf.compat.v1.global_variables_initializer())
+        # l = []
+        # for var in tf.compat.v1.global_variables():
+        #     if var.dtype == 'int64':
+        #         mul = 1
+        #     else:
+        #         mul = 0.001
+        #     l.append(var.assign(tf.ones_like(var) * mul))
 
-        var_reset = tf.group(l)
-        self.session.run(var_reset)
+        # var_reset = tf.group(l)
+        # self.session.run(var_reset)
 
     def train(self):
         for iter_i in range(self.max_iter):
